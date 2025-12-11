@@ -64,7 +64,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 p-4 md:p-8">
+    <div className="h-full bg-linear-to-br from-background via-background to-muted/20 p-4 md:p-8">
       <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">

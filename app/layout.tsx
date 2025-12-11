@@ -1,5 +1,7 @@
+import { Github } from "lucide-react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,9 +27,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
       >
-        {children}
+        <div className="flex-1 h-full overflow-y-auto py-3">{children}</div>
+        <footer className="border-t py-6 px-4 md:px-8">
+          <div className="mx-auto max-w-6xl flex items-center justify-center">
+            <Link
+              href="https://github.com/Ife-Ody/sonare-web"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Github className="size-4" />
+              <span className="text-sm">View on GitHub</span>
+            </Link>
+          </div>
+        </footer>
       </body>
     </html>
   );

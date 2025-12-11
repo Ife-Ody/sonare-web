@@ -1,7 +1,7 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
-import { useState } from "react";
+import { ArrowDownZA, ArrowUpAZ, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
 import { sonare } from "sonare";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,9 @@ export default function Home() {
   const [wordCount, setWordCount] = useState(10);
   const [words, setWords] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"unsorted" | "asc" | "desc">(
+    "unsorted",
+  );
 
   const generateWords = () => {
     setIsGenerating(true);
@@ -41,6 +44,23 @@ export default function Home() {
       setWords(newWords);
       setIsGenerating(false);
     }, 100);
+  };
+
+  const sortedWords = useMemo(() => {
+    if (sortOrder === "unsorted") return words;
+    if (sortOrder === "asc") {
+      return [...words].sort((a, b) => a.localeCompare(b));
+    }
+    // desc
+    return [...words].sort((a, b) => b.localeCompare(a));
+  }, [words, sortOrder]);
+
+  const toggleSort = () => {
+    setSortOrder((current) => {
+      if (current === "unsorted") return "asc";
+      if (current === "asc") return "desc";
+      return "unsorted";
+    });
   };
 
   return (
@@ -128,11 +148,14 @@ export default function Home() {
                     id="word-count"
                     type="number"
                     min={1}
-                    max={1000}
+                    max={100}
                     value={wordCount}
                     onChange={(e) =>
                       setWordCount(
-                        Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)),
+                        Math.max(
+                          1,
+                          Math.min(100, parseInt(e.target.value, 10) || 1),
+                        ),
                       )
                     }
                     className="w-full"
@@ -158,15 +181,37 @@ export default function Home() {
             {words.length > 0 && (
               <Card>
                 <CardHeader className="py-4">
-                  <CardTitle>Generated Words</CardTitle>
-                  <CardDescription>
-                    {words.length} unique word{words.length !== 1 ? "s" : ""}{" "}
-                    generated
-                  </CardDescription>
+                  <div className="flex items-center justify-between w-full">
+                    <div>
+                      <CardTitle>Generated Words</CardTitle>
+                      <CardDescription>
+                        {words.length} unique word
+                        {words.length !== 1 ? "s" : ""} generated
+                      </CardDescription>
+                    </div>
+                    <Button
+                      onClick={toggleSort}
+                      size="icon"
+                      variant={sortOrder === "unsorted" ? "outline" : "primary"}
+                      aria-label={
+                        sortOrder === "unsorted"
+                          ? "Sort words alphabetically"
+                          : sortOrder === "asc"
+                            ? "Sort words descending"
+                            : "Remove sorting"
+                      }
+                    >
+                      {sortOrder === "desc" ? (
+                        <ArrowDownZA className="size-4" />
+                      ) : (
+                        <ArrowUpAZ className="size-4" />
+                      )}
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {words.map((word) => (
+                    {sortedWords.map((word) => (
                       <Card key={word} className="border-2">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
@@ -194,10 +239,15 @@ export default function Home() {
                   </EmptyMedia>
                   <EmptyTitle>No words generated yet</EmptyTitle>
                   <EmptyDescription>
-                    Click &ldquo;Generate Words&rdquo; to create your first batch of
-                    pronounceable words
+                    Click &ldquo;Generate Words&rdquo; to create your first
+                    batch of pronounceable words
                   </EmptyDescription>
-                  <Button onClick={generateWords} disabled={isGenerating || minLength[0] > maxLength[0]} className="w-full" size="lg">
+                  <Button
+                    onClick={generateWords}
+                    disabled={isGenerating || minLength[0] > maxLength[0]}
+                    className="w-full"
+                    size="lg"
+                  >
                     Generate Words
                   </Button>
                 </EmptyHeader>
